@@ -210,9 +210,9 @@ export function renderChartSvg(chart: ChartData): string {
           notesSvg += `
             <rect
                 x="${middleX}"
-                y="${TOP_AND_BOTTOM_MARGIN}"
+                y="0"
                 width="${noteWidth}"
-                height="${PLAY_HEIGHT}"
+                height="${BLOCK_HEIGHT}"
                 fill="${HOLD_COLOR}"
             />
         `;
