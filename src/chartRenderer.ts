@@ -114,6 +114,37 @@ export function renderChartSvg(chart: ChartData): string {
 
     // ホールド
     if (note.end !== undefined) {
+      const startsExactlyOnBoundary =
+        Math.abs(note.start % BLOCK_BEATS) < 0.0001;
+
+      if (startsExactlyOnBoundary && block > 0) {
+        const prevX =
+          LEFT_MARGIN +
+          (block - 1) * (BLOCK_WIDTH + BLOCK_GAP) +
+          note.lane * laneWidth +
+          laneWidth * 0.1;
+
+        notesSvg += `
+          <rect
+            x="${prevX}"
+            y="0"
+            width="${noteWidth}"
+            height="${TOP_AND_BOTTOM_MARGIN}"
+            fill="${HOLD_COLOR}"
+            rx="2"
+          />
+        `;
+        notesSvg += `
+          <rect
+            x="${prevX}"
+            y="0"
+            width="${noteWidth}"
+            height="${TOP_AND_BOTTOM_MARGIN - 2}"
+            fill="${HOLD_COLOR}"
+          />
+        `;
+      }
+
       const endsExactlyOnBoundary = Math.abs(note.end % BLOCK_BEATS) < 0.0001;
       const endBlock = Math.floor(note.end / BLOCK_BEATS);
 
