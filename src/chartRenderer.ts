@@ -17,22 +17,34 @@ const BEAT_COLOR = "#333";
 
 const BACKGROUND_COLOR = "#000";
 
-export function renderChartSvg(chart: ChartData): string {
-  const maxBeat = Math.max(...chart.notes.map((n) => n.end ?? n.start));
+export function renderChartSvg(
+  chart: ChartData,
+  startMeasure: number,
+  endMeasure: number,
+): string {
+  const startBeat = (startMeasure - 1) * 4;
 
-  const blockCount = Math.ceil(maxBeat / BLOCK_BEATS);
+  const endBeat = endMeasure * 4;
+
+  const visibleBeatCount = endBeat - startBeat;
+
+  const blockCount = Math.ceil(visibleBeatCount / BLOCK_BEATS);
 
   const width = LEFT_MARGIN + blockCount * (BLOCK_WIDTH + BLOCK_GAP);
 
   const pixelsPerBeat = PLAY_HEIGHT / BLOCK_BEATS;
 
+  const startBlock = Math.floor(startBeat / BLOCK_BEATS);
+
   let gridSvg = "";
+
+  const firstVisibleMeasure = Math.floor(startBeat / 4) + 1;
 
   for (let block = 0; block < blockCount; block++) {
     const blockX = LEFT_MARGIN + block * (BLOCK_WIDTH + BLOCK_GAP);
 
     // 小節番号
-    const firstMeasure = block * 2 + 1;
+    const firstMeasure = firstVisibleMeasure + block * 2;
 
     const secondMeasure = firstMeasure + 1;
 
@@ -95,10 +107,18 @@ export function renderChartSvg(chart: ChartData): string {
 
   let notesSvg = "";
 
-  for (const note of chart.notes) {
-    const block = Math.floor(note.start / BLOCK_BEATS);
+  const visibleNotes = chart.notes.filter((note) => {
+    const noteEnd = note.end ?? note.start;
 
-    const localBeat = note.start % BLOCK_BEATS;
+    return noteEnd >= startBeat && note.start <= endBeat;
+  });
+
+  for (const note of visibleNotes) {
+    const localBeat = note.start - startBeat;
+
+    const block = Math.floor(localBeat / BLOCK_BEATS);
+
+    const beatInBlock = localBeat % BLOCK_BEATS;
 
     const laneWidth = BLOCK_WIDTH / chart.columns;
 
@@ -110,12 +130,13 @@ export function renderChartSvg(chart: ChartData): string {
       note.lane * laneWidth +
       laneWidth * 0.1;
 
-    const y = BLOCK_HEIGHT - TOP_AND_BOTTOM_MARGIN - localBeat * pixelsPerBeat;
+    const y =
+      BLOCK_HEIGHT - TOP_AND_BOTTOM_MARGIN - beatInBlock * pixelsPerBeat;
 
     // ホールド
     if (note.end !== undefined) {
       const startsExactlyOnBoundary =
-        Math.abs(note.start % BLOCK_BEATS) < 0.0001;
+        Math.abs(localBeat % BLOCK_BEATS) < 0.0001;
 
       if (startsExactlyOnBoundary && block > 0) {
         const prevX =
@@ -144,15 +165,17 @@ export function renderChartSvg(chart: ChartData): string {
           />
         `;
       }
+      const localEndBeat = note.end - startBeat;
+      const endsExactlyOnBoundary =
+        Math.abs(localEndBeat % BLOCK_BEATS) < 0.0001;
 
-      const endsExactlyOnBoundary = Math.abs(note.end % BLOCK_BEATS) < 0.0001;
-      const endBlock = Math.floor(note.end / BLOCK_BEATS);
+      const endBlock = Math.floor(localEndBeat / BLOCK_BEATS);
 
       if (
         endBlock === block ||
         (endBlock === block + 1 && endsExactlyOnBoundary)
       ) {
-        const endLocalBeat = note.end % BLOCK_BEATS;
+        const endLocalBeat = localEndBeat % BLOCK_BEATS;
         const adjustedEndLocalBeat = endsExactlyOnBoundary
           ? BLOCK_BEATS
           : endLocalBeat;
@@ -255,7 +278,7 @@ export function renderChartSvg(chart: ChartData): string {
           note.lane * laneWidth +
           laneWidth * 0.1;
 
-        const endLocalBeat = note.end % BLOCK_BEATS;
+        const endLocalBeat = localEndBeat % BLOCK_BEATS;
 
         const lastHeight =
           BLOCK_HEIGHT - TOP_AND_BOTTOM_MARGIN - endLocalBeat * pixelsPerBeat;
@@ -295,7 +318,7 @@ export function renderChartSvg(chart: ChartData): string {
       `;
 
       const startsExactlyOnBoundary =
-        Math.abs(note.start % BLOCK_BEATS) < 0.0001;
+        Math.abs(localBeat % BLOCK_BEATS) < 0.0001;
 
       if (startsExactlyOnBoundary && block > 0) {
         const prevX =
