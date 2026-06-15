@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -182,3 +184,34 @@
     border-right-color: var(--border);
   }
 }
+
+.app {
+  width: 100%;
+  padding: 0;
+}
+
+.panel {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.panel select,
+.panel button {
+  padding: 8px 12px;
+}
+
+.preview {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+
+.black-ops-one-regular {
+  font-family: "Black Ops One", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
