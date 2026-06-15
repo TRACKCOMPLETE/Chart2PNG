@@ -34,8 +34,6 @@ export function renderChartSvg(
 
   const pixelsPerBeat = PLAY_HEIGHT / BLOCK_BEATS;
 
-  const startBlock = Math.floor(startBeat / BLOCK_BEATS);
-
   let gridSvg = "";
 
   const firstVisibleMeasure = Math.floor(startBeat / 4) + 1;
