@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 import { useEffect, useState } from "react";
 import { parseMc } from "./mcParser";
@@ -52,6 +53,33 @@ async function downloadPng(svg: string, fileName: string) {
 
     URL.revokeObjectURL(pngUrl);
   });
+}
+
+function downloadSvg(
+  svg: string,
+  fileName: string
+) {
+  const blob = new Blob(
+    [svg],
+    { type: "image/svg+xml" }
+  );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+  a.download =
+    fileName.replace(
+      /\.png$/,
+      ".svg"
+    );
+
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
 
 type ChartInfo = {
@@ -224,14 +252,35 @@ function App() {
               ))}
             </select>
           )}
-
-          <button
-            className="btn btn-primary"
-            onClick={() => downloadPng(svg, fileName)}
-            disabled={!svg}
-          >
-            PNG保存
-          </button>
+          <div className="dropdown">
+            <button
+              className="btn btn-primary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+            >
+              保存
+            </button>
+            <ul className="dropdown-menu dropdown-menu-end">
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => downloadPng(svg, fileName)}
+                  disabled={!svg}
+                >
+                  PNG保存
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => downloadSvg(svg, fileName)}
+                  disabled={!svg}
+                >
+                  SVG保存
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="d-flex gap-2 align-items-center mb-3">
