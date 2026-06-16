@@ -5,7 +5,7 @@ const BLOCK_WIDTH = 120;
 const BLOCK_HEIGHT = 900;
 
 const BLOCK_GAP = 50;
-const LEFT_MARGIN = 30;
+const LEFT_AND_RIGHT_MARGIN = 30;
 const TOP_AND_BOTTOM_MARGIN = 20;
 const PLAY_HEIGHT = BLOCK_HEIGHT - TOP_AND_BOTTOM_MARGIN * 2;
 
@@ -30,7 +30,11 @@ export function renderChartSvg(
 
   const blockCount = Math.ceil(visibleBeatCount / BLOCK_BEATS);
 
-  const width = LEFT_MARGIN + blockCount * (BLOCK_WIDTH + BLOCK_GAP);
+  const width =
+    LEFT_AND_RIGHT_MARGIN +
+    blockCount * (BLOCK_WIDTH + BLOCK_GAP) -
+    BLOCK_GAP +
+    LEFT_AND_RIGHT_MARGIN;
 
   const pixelsPerBeat = PLAY_HEIGHT / BLOCK_BEATS;
 
@@ -39,7 +43,7 @@ export function renderChartSvg(
   const firstVisibleMeasure = Math.floor(startBeat / 4) + 1;
 
   for (let block = 0; block < blockCount; block++) {
-    const blockX = LEFT_MARGIN + block * (BLOCK_WIDTH + BLOCK_GAP);
+    const blockX = LEFT_AND_RIGHT_MARGIN + block * (BLOCK_WIDTH + BLOCK_GAP);
 
     // 小節番号
     const firstMeasure = firstVisibleMeasure + block * 2;
@@ -48,11 +52,11 @@ export function renderChartSvg(
 
     gridSvg += `
     <text
-        x="${blockX - 20}"
+        x="${blockX - 5}"
         y="${BLOCK_HEIGHT - 4 - TOP_AND_BOTTOM_MARGIN}"
         font-size="14"
         fill="white"
-        text-align="right"
+        text-anchor="end"
     >
         ${firstMeasure}
     </text>
@@ -60,11 +64,11 @@ export function renderChartSvg(
 
     gridSvg += `
     <text
-        x="${blockX - 20}"
+        x="${blockX - 5}"
         y="${TOP_AND_BOTTOM_MARGIN + PLAY_HEIGHT / 2 - 4}"
         font-size="14"
         fill="white"
-        text-align="right"
+        text-anchor="end"
     >
         ${secondMeasure}
     </text>
@@ -123,7 +127,7 @@ export function renderChartSvg(
     const noteWidth = laneWidth * 0.8;
 
     const x =
-      LEFT_MARGIN +
+      LEFT_AND_RIGHT_MARGIN +
       block * (BLOCK_WIDTH + BLOCK_GAP) +
       note.lane * laneWidth +
       laneWidth * 0.1;
@@ -138,7 +142,7 @@ export function renderChartSvg(
 
       if (startsExactlyOnBoundary && block > 0) {
         const prevX =
-          LEFT_MARGIN +
+          LEFT_AND_RIGHT_MARGIN +
           (block - 1) * (BLOCK_WIDTH + BLOCK_GAP) +
           note.lane * laneWidth +
           laneWidth * 0.1;
@@ -200,7 +204,7 @@ export function renderChartSvg(
 
         if (endsExactlyOnBoundary && endBlock === block + 1) {
           const endX =
-            LEFT_MARGIN +
+            LEFT_AND_RIGHT_MARGIN +
             endBlock * (BLOCK_WIDTH + BLOCK_GAP) +
             note.lane * laneWidth +
             laneWidth * 0.1;
@@ -254,7 +258,7 @@ export function renderChartSvg(
           middleBlock++
         ) {
           const middleX =
-            LEFT_MARGIN +
+            LEFT_AND_RIGHT_MARGIN +
             middleBlock * (BLOCK_WIDTH + BLOCK_GAP) +
             note.lane * laneWidth +
             laneWidth * 0.1;
@@ -271,7 +275,7 @@ export function renderChartSvg(
         }
 
         const lastX =
-          LEFT_MARGIN +
+          LEFT_AND_RIGHT_MARGIN +
           endBlock * (BLOCK_WIDTH + BLOCK_GAP) +
           note.lane * laneWidth +
           laneWidth * 0.1;
@@ -320,7 +324,7 @@ export function renderChartSvg(
 
       if (startsExactlyOnBoundary && block > 0) {
         const prevX =
-          LEFT_MARGIN +
+          LEFT_AND_RIGHT_MARGIN +
           (block - 1) * (BLOCK_WIDTH + BLOCK_GAP) +
           note.lane * laneWidth +
           laneWidth * 0.1;

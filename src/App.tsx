@@ -25,16 +25,19 @@ async function downloadPng(svg: string, fileName: string) {
     img.src = url;
   });
 
+  const scale = 2;
+
   const canvas = document.createElement("canvas");
-  canvas.width = img.width;
-  canvas.height = img.height;
+  canvas.width = img.width * scale;
+  canvas.height = img.height * scale;
+
 
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     URL.revokeObjectURL(url);
     return;
   }
-
+  ctx.scale(scale, scale);
   ctx.drawImage(img, 0, 0);
   URL.revokeObjectURL(url);
 
