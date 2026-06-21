@@ -1,13 +1,13 @@
 import type { ChartData } from "./chart";
 
-const BLOCK_BEATS = 8;
+const BEATS_PER_MEASURE = 4;
+const PIXELS_PER_BEAT = 128;
+
 const BLOCK_WIDTH = 120;
-const BLOCK_HEIGHT = 900;
 
 const BLOCK_GAP = 50;
 const LEFT_AND_RIGHT_MARGIN = 30;
 const TOP_AND_BOTTOM_MARGIN = 20;
-const PLAY_HEIGHT = BLOCK_HEIGHT - TOP_AND_BOTTOM_MARGIN * 2;
 
 const TAP_COLOR = "#4FC3F7";
 const HOLD_COLOR = "#FFB74D";
@@ -21,10 +21,18 @@ export function renderChartSvg(
   chart: ChartData,
   startMeasure: number,
   endMeasure: number,
+  measuresPerBlock: number,
 ): string {
-  const startBeat = (startMeasure - 1) * 4;
+  const BLOCK_BEATS = measuresPerBlock * BEATS_PER_MEASURE;
 
-  const endBeat = endMeasure * 4;
+  const BLOCK_HEIGHT =
+    BLOCK_BEATS * PIXELS_PER_BEAT + TOP_AND_BOTTOM_MARGIN * 2;
+
+  const PLAY_HEIGHT = BLOCK_HEIGHT - TOP_AND_BOTTOM_MARGIN * 2;
+
+  const startBeat = (startMeasure - 1) * BEATS_PER_MEASURE;
+
+  const endBeat = endMeasure * BEATS_PER_MEASURE;
 
   const visibleBeatCount = endBeat - startBeat;
 
@@ -46,33 +54,29 @@ export function renderChartSvg(
     const blockX = LEFT_AND_RIGHT_MARGIN + block * (BLOCK_WIDTH + BLOCK_GAP);
 
     // 小節番号
-    const firstMeasure = firstVisibleMeasure + block * 2;
+    const firstMeasure = firstVisibleMeasure + block * measuresPerBlock;
 
-    const secondMeasure = firstMeasure + 1;
+    for (let measure = 0; measure < measuresPerBlock; measure++) {
+      const measureNumber = firstMeasure + measure;
 
-    gridSvg += `
+      const y =
+        BLOCK_HEIGHT -
+        TOP_AND_BOTTOM_MARGIN -
+        measure * (PLAY_HEIGHT / measuresPerBlock) -
+        4;
+
+      gridSvg += `
     <text
-        x="${blockX - 5}"
-        y="${BLOCK_HEIGHT - 4 - TOP_AND_BOTTOM_MARGIN}"
-        font-size="14"
-        fill="white"
-        text-anchor="end"
+      x="${blockX - 5}"
+      y="${y}"
+      font-size="14"
+      fill="white"
+      text-anchor="end"
     >
-        ${firstMeasure}
+      ${measureNumber}
     </text>
-`;
-
-    gridSvg += `
-    <text
-        x="${blockX - 5}"
-        y="${TOP_AND_BOTTOM_MARGIN + PLAY_HEIGHT / 2 - 4}"
-        font-size="14"
-        fill="white"
-        text-anchor="end"
-    >
-        ${secondMeasure}
-    </text>
-`;
+  `;
+    }
 
     // レーン線
     for (let lane = 0; lane <= chart.columns; lane++) {
@@ -93,6 +97,7 @@ export function renderChartSvg(
     // 拍線
     for (let beat = 0; beat <= BLOCK_BEATS; beat++) {
       const y = BLOCK_HEIGHT - TOP_AND_BOTTOM_MARGIN - beat * pixelsPerBeat;
+      const isMeasureLine = beat % BEATS_PER_MEASURE === 0;
 
       gridSvg += `
                 <line
@@ -101,7 +106,7 @@ export function renderChartSvg(
                     x2="${blockX + BLOCK_WIDTH}"
                     y2="${y}"
                     stroke="${BEAT_COLOR}"
-                    stroke-width="1"
+                    stroke-width="${isMeasureLine ? 2 : 1}"
                 />
             `;
     }

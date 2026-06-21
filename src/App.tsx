@@ -5,6 +5,7 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { parseMc } from "./mcParser";
 import { renderChartSvg } from "./chartRenderer";
+import type { ChartData } from "./chart";
 
 function sanitize(value: string) {
   return value
@@ -97,12 +98,13 @@ function App() {
   const [charts, setCharts] = useState<ChartInfo[]>([]);
   const [selectedMc, setSelectedMc] = useState("");
 
+  const [measuresPerBlock, setMeasuresPerBlock] = useState(2);
   const [startMeasure, setStartMeasure] = useState<number>(1);
   const [endMeasure, setEndMeasure] = useState<number>(1);
   const [maxMeasure, setMaxMeasure] = useState<number>(1);
 
   const [zipData, setZipData] = useState<JSZip | null>(null);
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
 
   const handleFile = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -214,9 +216,9 @@ function App() {
     );
 
     setSvg(
-      renderChartSvg(chartData, safeStart, safeEnd)
+      renderChartSvg(chartData, safeStart, safeEnd, measuresPerBlock)
     );
-  }, [chartData, startMeasure, endMeasure, maxMeasure]);
+  }, [chartData, startMeasure, endMeasure, maxMeasure, measuresPerBlock]);
 
   return (
     <div>
@@ -327,6 +329,21 @@ function App() {
                 {value}
               </option>
             ))}
+          </select>
+          <select
+            className="form-select"
+            style={{ maxWidth: "120px" }}
+            value={measuresPerBlock}
+            onChange={e =>
+              setMeasuresPerBlock(
+                Number(e.target.value)
+              )
+            }
+          >
+            <option value={1}>1小節</option>
+            <option value={2}>2小節</option>
+            <option value={4}>4小節</option>
+            <option value={8}>8小節</option>
           </select>
         </div>
 
